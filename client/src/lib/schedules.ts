@@ -14,25 +14,35 @@ export function getNextTrain(schedules: TrainSchedule[]): TrainSchedule | null {
     timeZone: "America/New_York"
   }));
 
+  // Format current time for comparison
+  const currentTimeString = currentTimeEST.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
+  console.log('Current time (EST):', currentTimeString);
+
   // Try to find next train today
   for (const schedule of schedules) {
-    // Parse the departure time into a Date object for today
-    const [time, period] = schedule.departureTime.split(' ');
-    const [hours, minutes] = time.split(':');
+    console.log('Checking schedule:', schedule.departureTime);
 
-    const scheduleDate = new Date(currentTimeEST);
-    scheduleDate.setHours(
-      period === 'PM' && hours !== '12' 
-        ? parseInt(hours) + 12 
-        : period === 'AM' && hours === '12'
-        ? 0
-        : parseInt(hours),
-      parseInt(minutes),
-      0,
-      0
-    );
+    // Parse the times for comparison
+    const [scheduleTime, schedulePeriod] = schedule.departureTime.split(' ');
+    const [currentTime, currentPeriod] = currentTimeString.split(' ');
 
-    if (isAfter(scheduleDate, currentTimeEST)) {
+    // Convert to 24-hour format for comparison
+    const [scheduleHour, scheduleMinute] = scheduleTime.split(':').map(Number);
+    const [currentHour, currentMinute] = currentTime.split(':').map(Number);
+
+    // Convert to minutes since midnight for easier comparison
+    const scheduleMinutes = (scheduleHour % 12 + (schedulePeriod === 'PM' ? 12 : 0)) * 60 + scheduleMinute;
+    const currentMinutes = (currentHour % 12 + (currentPeriod === 'PM' ? 12 : 0)) * 60 + currentMinute;
+
+    console.log('Schedule minutes:', scheduleMinutes, 'Current minutes:', currentMinutes);
+
+    if (scheduleMinutes > currentMinutes) {
+      console.log('Found next train:', schedule.departureTime);
       return schedule;
     }
   }
