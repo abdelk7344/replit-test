@@ -21,6 +21,13 @@ export default function Home() {
   const nextInbound = inboundSchedules ? getNextTrain(inboundSchedules) : null;
   const nextOutbound = outboundSchedules ? getNextTrain(outboundSchedules) : null;
 
+  const currentTime = new Date().toLocaleTimeString('en-US', { 
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted p-8">
       <div className="max-w-4xl mx-auto space-y-8">
@@ -29,7 +36,7 @@ export default function Home() {
             Hello, Abdelmonem Khedr
           </h1>
           <p className="text-muted-foreground">
-            Here are your next available trains
+            Current time: {currentTime} EST
           </p>
         </header>
 
@@ -47,10 +54,10 @@ export default function Home() {
               ) : nextInbound ? (
                 <div className="space-y-2">
                   <div className="text-2xl font-bold">
-                    Departure: {nextInbound.departureTime}
+                    Next train departs: {nextInbound.departureTime}
                   </div>
                   <div className="text-muted-foreground">
-                    Arrival: {nextInbound.arrivalTime}
+                    Arrives: {nextInbound.arrivalTime}
                   </div>
                 </div>
               ) : (
@@ -74,10 +81,10 @@ export default function Home() {
               ) : nextOutbound ? (
                 <div className="space-y-2">
                   <div className="text-2xl font-bold">
-                    Departure: {nextOutbound.departureTime}
+                    Next train departs: {nextOutbound.departureTime}
                   </div>
                   <div className="text-muted-foreground">
-                    Arrival: {nextOutbound.arrivalTime}
+                    Arrives: {nextOutbound.arrivalTime}
                   </div>
                 </div>
               ) : (
