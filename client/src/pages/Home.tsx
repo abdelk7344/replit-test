@@ -1,22 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Train } from "lucide-react";
 import type { TrainSchedule } from "@/lib/schedules";
-import { getNextTrain } from "@/lib/schedules";
+import { getNextTrain, getSchedules } from "@/lib/schedules";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  const { data: inboundSchedules, isLoading: inboundLoading } = useQuery<
-    TrainSchedule[]
-  >({
-    queryKey: ["/api/schedules/inbound"],
-  });
+  const [inboundSchedules, setInboundSchedules] = useState<TrainSchedule[]>([]);
+  const [outboundSchedules, setOutboundSchedules] = useState<TrainSchedule[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: outboundSchedules, isLoading: outboundLoading } = useQuery<
-    TrainSchedule[]
-  >({
-    queryKey: ["/api/schedules/outbound"],
-  });
+  useEffect(() => {
+    // Load schedules from static data
+    setInboundSchedules(getSchedules('inbound'));
+    setOutboundSchedules(getSchedules('outbound'));
+    setLoading(false);
+  }, []);
 
   const nextInbound = inboundSchedules ? getNextTrain(inboundSchedules) : null;
   const nextOutbound = outboundSchedules ? getNextTrain(outboundSchedules) : null;
@@ -33,7 +32,7 @@ export default function Home() {
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="text-center space-y-2">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            Hello, Abdelmonem Khedr
+            MBTA Schedule Viewer
           </h1>
           <p className="text-muted-foreground">
             Current time: {currentTime} EST
@@ -49,7 +48,7 @@ export default function Home() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {inboundLoading ? (
+              {loading ? (
                 <Skeleton className="h-20 w-full" />
               ) : nextInbound ? (
                 <div className="space-y-2">
@@ -76,7 +75,7 @@ export default function Home() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {outboundLoading ? (
+              {loading ? (
                 <Skeleton className="h-20 w-full" />
               ) : nextOutbound ? (
                 <div className="space-y-2">
